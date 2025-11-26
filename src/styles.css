@@ -262,3 +262,20 @@ body:not([data-loading="true"]) #content-panel {
     padding-top: 1rem;
   }
 }
+
+/* Layout mode: tree-only hides the preview pane */
+
+body[data-layout="tree-only"] #preview-pane {
+  display: none;
+}
+
+body[data-layout="tree-only"] #tree-pane {
+  flex: 1 1 100%;
+}
+
+/* Resize note styling */
+#resize-note {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}

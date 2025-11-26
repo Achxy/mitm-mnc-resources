@@ -5,6 +5,35 @@ const treeContainer = document.getElementById("tree-container");
 const previewPane = document.getElementById("preview-pane");
 const previewPlaceholder = document.getElementById("preview-placeholder");
 const siteLogo = document.getElementById("site-logo");
+const resizeNote = document.getElementById("resize-note");
+const MIN_FULL_WIDTH = 1000; // minimum viewport width (in px) for showing tree + preview
+
+const isMobileDevice = () => {
+  const ua = navigator.userAgent || navigator.vendor || window.opera || "";
+  return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(ua);
+};
+
+const applyLayoutMode = () => {
+  if (!document.body) return;
+
+  // Mobile devices are handled separately and should not reach here
+  if (isMobileDevice()) {
+    return;
+  }
+
+  const isNarrow = window.innerWidth < MIN_FULL_WIDTH;
+  if (isNarrow) {
+    document.body.dataset.layout = "tree-only";
+    if (resizeNote) {
+      resizeNote.hidden = false;
+    }
+  } else {
+    document.body.dataset.layout = "full";
+    if (resizeNote) {
+      resizeNote.hidden = true;
+    }
+  }
+};
 if (siteLogo) {
   siteLogo.src = logoUrl;
 }
@@ -300,4 +329,18 @@ const init = async () => {
   }
 };
 
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener("DOMContentLoaded", () => {
+  // If the user is on a mobile device, do not load the app – show plaintext only.
+  if (isMobileDevice()) {
+    if (document.body) {
+      document.body.innerHTML = "I haven't got time to develop the mobile version yet";
+    }
+    return;
+  }
+
+  // Desktop: apply initial layout mode and listen to resizes
+  applyLayoutMode();
+  window.addEventListener("resize", applyLayoutMode);
+
+  init();
+});
