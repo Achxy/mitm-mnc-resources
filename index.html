@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Class Resources</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href="/resources-manifest.json" as="fetch" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header id="site-header">
+      <div id="logo-area">
+        <img src="/logo.png" alt="Class logo" id="site-logo" />
+      </div>
+    </header>
+    <main id="app" aria-label="Class resources">
+      <section id="content-panel">
+        <h1 id="content-title">Contents</h1>
+        <div id="tree-container" role="tree" aria-label="Contents tree"></div>
+      </section>
+    </main>
+    <footer id="site-footer">
+      <p id="footer-text">
+        Designed and maintained by MnC'24 batch
+      </p>
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

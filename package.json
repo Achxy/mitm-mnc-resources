@@ -1,0 +1,9 @@
+{
+  "name": "mitm-mnc-resource-hub",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:manifest": "node ./scripts/generateManifest.mjs"
+  }
+}
