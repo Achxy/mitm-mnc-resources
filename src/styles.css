@@ -94,7 +94,7 @@ body {
 .tree-item {
   list-style: none;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   cursor: pointer;
   padding: 4px 6px;
   width: 100%;
@@ -110,9 +110,10 @@ body {
 
 .tree-item-label {
   flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  word-break: break-word;
 }
 
 .tree-item-folder > .tree-item-label {
