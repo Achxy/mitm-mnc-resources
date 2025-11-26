@@ -1,4 +1,11 @@
+import "./styles.css";
+import logoUrl from "./assets/mnc-logo.png";
+
 const treeContainer = document.getElementById("tree-container");
+const siteLogo = document.getElementById("site-logo");
+if (siteLogo) {
+  siteLogo.src = logoUrl;
+}
 const COURSE_PLAN_KEYWORD = "course plan";
 
 const registerServiceWorker = () => {

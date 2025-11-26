@@ -1,8 +1,8 @@
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const PDF_CACHE = `pdf-${CACHE_VERSION}`;
 
-const STATIC_ASSETS = ["/", "/index.html", "/styles.css", "/app.js", "/resources-manifest.json", "/assets/mnc-logo.png"];
+const STATIC_ASSETS = ["/", "/index.html", "/resources-manifest.json", "/sw.js"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

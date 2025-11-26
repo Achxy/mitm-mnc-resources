@@ -4,7 +4,7 @@ import path from "path";
 const ROOT_LABEL = "Contents";
 const ROOT_WEB_PATH = "/contents";
 const CONTENTS_DIR = path.resolve("contents");
-const OUTPUT_FILE = path.resolve("resources-manifest.json");
+const OUTPUT_FILE = path.resolve("public/resources-manifest.json");
 const SITEIGNORE_PATH = path.join(CONTENTS_DIR, ".siteignore");
 
 const collator = new Intl.Collator(undefined, { sensitivity: "base", numeric: true });
@@ -191,6 +191,7 @@ const generateManifest = async () => {
     children: await buildChildren(CONTENTS_DIR, ROOT_WEB_PATH, "", isIgnored),
   };
 
+  await fs.mkdir(path.dirname(OUTPUT_FILE), { recursive: true });
   await fs.writeFile(OUTPUT_FILE, JSON.stringify(manifest, null, 2), "utf8");
   console.log(`Manifest written to ${OUTPUT_FILE}`);
 };
