@@ -2,6 +2,8 @@ import "./styles.css";
 import logoUrl from "./assets/mnc-logo.png";
 
 const treeContainer = document.getElementById("tree-container");
+const previewPane = document.getElementById("preview-pane");
+const previewPlaceholder = document.getElementById("preview-placeholder");
 const siteLogo = document.getElementById("site-logo");
 if (siteLogo) {
   siteLogo.src = logoUrl;
@@ -74,6 +76,90 @@ const prefetchCoursePlanPdfs = (manifestRoot) => {
   }
 };
 
+const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"]);
+
+const clearPreview = () => {
+  if (!previewPane) return;
+  const existing = previewPane.querySelector(".preview-content");
+  if (existing) {
+    existing.remove();
+  }
+};
+
+const ensurePlaceholderVisible = (visible) => {
+  if (!previewPlaceholder) return;
+  previewPlaceholder.style.display = visible ? "" : "none";
+};
+
+const buildFolderTreeLines = (node, indent = "") => {
+  const lines = [];
+  const children = node.children || [];
+  children.forEach((child, index) => {
+    const isLast = index === children.length - 1;
+    const branch = isLast ? "└── " : "├── ";
+    const nextIndent = indent + (isLast ? "    " : "│   ");
+    lines.push(indent + branch + child.name);
+    if (child.type === "directory" && Array.isArray(child.children) && child.children.length > 0) {
+      lines.push(...buildFolderTreeLines(child, nextIndent));
+    }
+  });
+  return lines;
+};
+
+const showPreviewForNode = (node) => {
+  if (!previewPane) return;
+
+  clearPreview();
+
+  const container = document.createElement("div");
+  container.className = "preview-content";
+
+  // Folder preview: show a "tree" style listing
+  if (node.type === "directory") {
+    const pre = document.createElement("pre");
+    pre.className = "preview-tree-text";
+    const lines = [node.name];
+    lines.push(...buildFolderTreeLines(node, ""));
+    pre.textContent = lines.join("\n");
+    container.appendChild(pre);
+    previewPane.appendChild(container);
+    ensurePlaceholderVisible(false);
+    return;
+  }
+
+  // File preview
+  if (node.type === "file") {
+    const ext = node.extension ? node.extension.toLowerCase() : "";
+
+    if (isPdfFile(node)) {
+      const iframe = document.createElement("iframe");
+      iframe.src = node.path;
+      iframe.setAttribute("title", node.name);
+      container.appendChild(iframe);
+      previewPane.appendChild(container);
+      ensurePlaceholderVisible(false);
+      return;
+    }
+
+    if (IMAGE_EXTENSIONS.has(ext)) {
+      const img = document.createElement("img");
+      img.src = node.path;
+      img.alt = node.name;
+      container.appendChild(img);
+      previewPane.appendChild(container);
+      ensurePlaceholderVisible(false);
+      return;
+    }
+  }
+
+  // Fallback: unsupported preview
+  const fallback = document.createElement("p");
+  fallback.textContent = "No preview available for this item.";
+  container.appendChild(fallback);
+  previewPane.appendChild(container);
+  ensurePlaceholderVisible(false);
+};
+
 const toggleDirectory = (itemElement, directoryNode) => {
   const isExpanded = itemElement.getAttribute("aria-expanded") === "true";
   const nextExpanded = !isExpanded;
@@ -127,6 +213,10 @@ const createDirectoryItem = (node) => {
     }
   });
 
+  item.addEventListener("mouseenter", () => {
+    showPreviewForNode(node);
+  });
+
   item.appendChild(indicator);
   item.appendChild(label);
   return item;
@@ -153,6 +243,10 @@ const createFileItem = (node) => {
   const label = document.createElement("span");
   label.className = "tree-item-label";
   label.textContent = node.name;
+
+  item.addEventListener("mouseenter", () => {
+    showPreviewForNode(node);
+  });
 
   link.appendChild(label);
   item.appendChild(indicator);
