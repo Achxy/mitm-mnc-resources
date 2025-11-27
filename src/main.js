@@ -397,8 +397,8 @@ const processAssetQueue = async () => {
           if (response.ok) {
             await cache.put(node.path, response);
           }
-          // Throttle: wait 200ms between requests to prevent server overload
-          await delay(200);
+          // Throttle: wait 1000ms between requests to prevent server overload
+          await delay(1000);
         }
       } catch (err) {
         console.warn("Passive load failed for", node.path, err);
@@ -432,12 +432,15 @@ const init = async () => {
       const allAssets = collectAllAssets(manifest.children || []);
       assetQueue.push(...allAssets);
 
-      if ("requestIdleCallback" in window) {
-        requestIdleCallback(processAssetQueue);
-      } else {
-        // Fallback for browsers without requestIdleCallback
-        setTimeout(processAssetQueue, 1000);
-      }
+      // Initial Delay: Wait 5 seconds before starting to avoid contending with critical assets
+      setTimeout(() => {
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(processAssetQueue);
+        } else {
+          // Fallback for browsers without requestIdleCallback
+          setTimeout(processAssetQueue, 1000);
+        }
+      }, 5000);
     } else {
       console.log("Passive loading disabled due to connection constraints.");
     }
