@@ -1,6 +1,7 @@
 const CACHE_VERSION = "v3";
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
-const PDF_CACHE = `pdf-${CACHE_VERSION}`;
+// Shared cache name with main.js
+const RESOURCE_CACHE = "mnc-resource-cache-v1";
 
 const STATIC_ASSETS = ["/", "/index.html", "/resources-manifest.json", "/sw.js"];
 
@@ -17,7 +18,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((key) => (key.startsWith("static-") || key.startsWith("pdf-")) && key !== STATIC_CACHE && key !== PDF_CACHE)
+          .filter((key) => key.startsWith("static-") && key !== STATIC_CACHE)
           .map((key) => caches.delete(key))
       )
     )
@@ -25,17 +26,23 @@ self.addEventListener("activate", (event) => {
 });
 
 const cacheFirstPdf = async (request) => {
-  const cache = await caches.open(PDF_CACHE);
+  // Try the shared resource cache first (populated by passive loader)
+  const cache = await caches.open(RESOURCE_CACHE);
   const cached = await cache.match(request);
   if (cached) {
     return cached;
   }
 
-  const response = await fetch(request);
-  if (response && response.status === 200) {
-    cache.put(request, response.clone());
+  // Fallback to network
+  try {
+    const response = await fetch(request);
+    if (response && response.status === 200) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    throw error;
   }
-  return response;
 };
 
 const networkFirst = async (request) => {
